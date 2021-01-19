@@ -18,6 +18,17 @@ CORS(app)
 '''
 #db_drop_and_create_all()
 
+#-------------------------------------------
+# Headers
+#-------------------------------------------
+
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization, true')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    return response
+
+
 ## ROUTES
 '''
 @TODO implement endpoint
@@ -27,36 +38,29 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+
+# Fake data to start. Data type structure success and rendering in front-end.
 @app.route('/drinks')
 def get_drinks():
-    list_drinks = Drink.query.all()        
-    drinks = {}
-    # for drink in list_drinks:
-    #     recipe[drink.id] = drink.recipe
-    #     drinks.append({
-    #         "id": drink.id,
-    #         "title": drink.title,
-    #         "recipe": recipe
-    #     })
     drinks = {
         'title': 'matcha shake',
         'recipe': [
             {
                 'name':'milk',
-                'color':'grey',
-                'parts': 1
+                'color':'gray',
+                'parts': 2
             },
             {
                 'name':'matcha',
-                'color':'green',
-                'parts': 3
+                'color':'brown',
+                'parts': 2
             }
         ]
     }
 
     return jsonify({
     'success': True,
-    'drinks': drinks
+    'drinks': [drinks]
 })
 
 
