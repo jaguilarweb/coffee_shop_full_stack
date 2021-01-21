@@ -40,29 +40,14 @@ def after_request(response):
         or appropriate status code indicating reason for failure
 '''
 
-# Fake data to start. Data type structure success and rendering in front-end.
 @app.route('/drinks')
 def get_drinks():
-    drinks = {
-        'id': 2,
-        'title': 'matcha shake',
-        'recipe': [
-            {
-                'name': 'milk',
-                'color': 'gray',
-                'parts': 2
-            },
-            {
-                'name': 'matcha',
-                'color': 'brown',
-                'parts': 2
-            }
-        ]
-    }
+    drinks = Drink.query.all()
+    drinks = [drink.short() for drink in drinks]
 
     return jsonify({
-        'success': True,
-        'drinks': [drinks]
+    'success': True,
+    'drinks': drinks
     })
 
 '''
@@ -76,26 +61,17 @@ def get_drinks():
 @app.route('/drinks-detail')
 @requires_auth('get:drinks-detail')
 def get_drink_detail(payload):
-    drinks = {
-        'id': 2,
-        'title': 'matcha shake',
-        'recipe': [
-            {
-                'name': 'milk',
-                'color': 'gray',
-                'parts': 2
-            },
-            {
-                'name': 'matcha',
-                'color': 'brown',
-                'parts': 2
-            }
-        ]
-    }
-
+    drinks_list = Drink.query.all()
+    # for drink in drinks_list:
+    #     drinks = {
+    #         'id': drink.id,
+    #         'title': drink.title,
+    #         'recipe': drink.recipe
+    #     }
+    
     return jsonify({
         'success': True,
-        'drinks': [drinks]
+        'drinks': [drinks_list]
     })
 
 
@@ -114,18 +90,19 @@ def create_drink(payload):
     body = request.get_json()
     title = body.get('title', None)
     recipe = body.get('recipe', None)
-    print(recipe)
 
     try:
         newDrink = Drink(title=title, recipe=json.dumps(recipe))
         newDrink.insert()
     except Exception as e:
         print(e)
+
     return jsonify({"success": True,
-                    "drinks": [{
+                    "drinks": {
+                                "id": newDrink.id,
                                 "title": newDrink.title,
                                 "recipe": newDrink.recipe
-                              }]
+                              }
                     })
 
 '''
