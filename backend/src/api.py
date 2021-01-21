@@ -61,7 +61,8 @@ def get_drinks():
 @app.route('/drinks-detail')
 @requires_auth('get:drinks-detail')
 def get_drink_detail(payload):
-    drinks = Drink.query.all()
+ #   drinks = Drink.query.all()
+    drinks = Drink.query.order_by(Drink.id.desc()).limit(1).all()  
     drinks = [drink.long() for drink in drinks]
 
     return jsonify({
@@ -89,7 +90,8 @@ def create_drink(payload):
     try:
         newDrink = Drink(title=title, recipe=json.dumps(recipe))
         newDrink.insert()
-        drinks = Drink.query.all()
+        # List present the last two drink created.
+        drinks = Drink.query.order_by(Drink.id.desc()).limit(2).all()       
         drinks = [drink.long() for drink in drinks]
 
     except Exception as e:
@@ -100,15 +102,6 @@ def create_drink(payload):
     'drinks': drinks
     }), 200
 
-
-
-    # return jsonify({"success": True,
-    #                 "drinks": {
-    #                             "id": newDrink.id,
-    #                             "title": newDrink.title,
-    #                             "recipe": newDrink.recipe
-    #                           }
-    #                 })
 
 '''
 @TODO implement endpoint
