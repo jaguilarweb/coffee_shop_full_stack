@@ -94,8 +94,11 @@ def create_drink(payload):
         drinks = Drink.query.order_by(Drink.id.desc()).limit(2).all()       
         drinks = [drink.long() for drink in drinks]
 
-    except Exception as e:
-        print(e)
+    # except Exception as e:
+    #     print(e)
+
+    except:
+        abort(404)
 
     return jsonify({
     'success': True,
@@ -115,6 +118,11 @@ def create_drink(payload):
         or appropriate status code indicating reason for failure
 '''
 
+    # except Exception as e:
+    #     print(e)
+
+
+
 
 '''
 @TODO implement endpoint
@@ -126,6 +134,25 @@ def create_drink(payload):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<int:drink_id>', methods=['DELETE'])
+@requires_auth('delete:drinks')
+def delete_drink(payload, drink_id):
+    try:
+        drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+        if drink is None:
+            abort(404)
+
+        drink.delete()
+    
+    except Exception as e:
+        print(e)
+
+    return jsonify({
+    'success': True,
+    'delete': drink_id
+    }), 200
+
+
 
 
 ## Error Handling
