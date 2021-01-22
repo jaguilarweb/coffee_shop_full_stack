@@ -125,7 +125,7 @@ def create_drink(payload):
 
 
 # -------------------------------------------
-# PATCH endpoint update drink
+# PATCH endpoint update drink by id
 # -------------------------------------------
 '''
 @TODO implement endpoint
@@ -172,7 +172,7 @@ def update_drink(payload, drink_id):
 
 
 # -------------------------------------------
-# DELETE endpoint create new drink
+# DELETE endpoint delete drink by id
 # -------------------------------------------
 '''
 @TODO implement endpoint
