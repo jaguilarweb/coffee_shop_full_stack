@@ -266,7 +266,7 @@ def not_found(error):
 
 
 @app.errorhandler(401)
-def Unauthorized(error):
+def unauthorized(error):
     return jsonify({
                     "success": False,
                     "error": 401,
