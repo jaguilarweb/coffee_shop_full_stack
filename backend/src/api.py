@@ -50,13 +50,19 @@ def after_request(response):
 
 @app.route('/drinks')
 def get_drinks():
-    drinks = Drink.query.all()
-    drinks = [drink.short() for drink in drinks]
+    drinks_list = Drink.query.all()
+    drinks = {}
+
+    if len(drinks_list) == 0:
+        abort(404)
+
+    drinks = [drink.short() for drink in drinks_list]
 
     return jsonify({
         'success': True,
         'drinks': drinks
     }), 200
+
 
 # -------------------------------------------
 # GET endpoint. List drinks-detail.
@@ -74,9 +80,13 @@ def get_drinks():
 @app.route('/drinks-detail')
 @requires_auth('get:drinks-detail')
 def get_drink_detail(payload):
+    drinks_list = Drink.query.all()
+    drinks = {}
 
-    drinks = Drink.query.order_by(Drink.id.desc()).limit(1).all()
-    drinks = [drink.long() for drink in drinks]
+    if len(drinks_list) == 0:
+        abort(404)
+
+    drinks = [drink.long() for drink in drinks_list]
 
     return jsonify({
         'success': True,
@@ -105,18 +115,17 @@ def create_drink(payload):
     title = body.get('title', None)
     recipe = body.get('recipe', None)
 
+    if (title == ""):
+        abort(422)
+
     try:
-        newDrink = Drink(title=title, recipe=json.dumps(recipe))
-        newDrink.insert()
-        # List present the last two drink created.
-        drinks = Drink.query.order_by(Drink.id.desc()).limit(2).all()
+        new_drink = Drink(title=title, recipe=json.dumps(recipe))
+        new_drink.insert()
+        drinks = Drink.query.order_by(Drink.id.desc()).all()
         drinks = [drink.long() for drink in drinks]
 
-    # except Exception as e:
-    #     print(e)
-
     except:
-        abort(404)
+        abort(422)
 
     return jsonify({
         'success': True,
@@ -147,23 +156,24 @@ def update_drink(payload, drink_id):
     new_title = body.get('title', None)
     new_recipe = body.get('recipe', None)
 
-    try:
-        drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
-        if drink is None:
-            abort(404)
+    if (new_title == ""):
+        abort(422)
 
+    drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+
+    if drink is None:
+        abort(404)
+
+    try:
         drink.title = new_title
         drink.recipe = json.dumps(new_recipe)
         drink.update()
         # List present the last two drink created.
-        drinks = Drink.query.order_by(Drink.id.desc()).limit(2).all()
+        drinks = Drink.query.order_by(Drink.id.desc()).all()
         drinks = [drink.long() for drink in drinks]
 
-    # except Exception as e:
-    #     print(e)
-
     except:
-        print(e)
+        abort(422)
 
     return jsonify({
         'success': True,
@@ -189,14 +199,16 @@ def update_drink(payload, drink_id):
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
 def delete_drink(payload, drink_id):
-    try:
-        drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
-        if drink is None:
-            abort(404)
 
+    drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+    if drink is None:
+        abort(404)
+
+    try:
         drink.delete()
-    except Exception as e:
-        print(e)
+
+    except:
+        abort(422)
 
     return jsonify({
         'success': True,
