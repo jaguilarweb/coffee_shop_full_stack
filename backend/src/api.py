@@ -52,10 +52,6 @@ def after_request(response):
 def get_drinks():
     drinks_list = Drink.query.all()
     drinks = {}
-
-    if len(drinks_list) == 0:
-        abort(404)
-
     drinks = [drink.short() for drink in drinks_list]
 
     return jsonify({
@@ -82,10 +78,6 @@ def get_drinks():
 def get_drink_detail(payload):
     drinks_list = Drink.query.all()
     drinks = {}
-
-    if len(drinks_list) == 0:
-        abort(404)
-
     drinks = [drink.long() for drink in drinks_list]
 
     return jsonify({
@@ -272,3 +264,13 @@ def unauthorized(error):
                     "error": 401,
                     "message": "unauthorized"
                     }), 401
+
+
+@app.errorhandler(AuthError)
+def handle_auth_error(ex):
+    """
+    Receive the raised authorization error and propagates it as response
+    """
+    response = jsonify(ex.error)
+    response.status_code = ex.status_code
+    return response
